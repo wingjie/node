@@ -36,10 +36,11 @@ app.all('*', function(req, res, next) {
     // var callback = req.body;
     // res.send(callback + "({ name: '5'})")
     req.on('data',function(data){
-      console.log(data)
-      obj=JSON.parse(data);
-      console.log(obj);
-      res.send('数据已接收')
+      console.log(data, 'data');
+      obj=JSON.parse(data.toString('utf8'));
+      
+      // console.log(obj);
+      res.send(data)
     })
   });
 
