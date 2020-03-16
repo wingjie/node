@@ -3,9 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "connect-multiparty": "^2.2.0",
+    "express": "^4.17.1",
+    "multiparty": "^4.2.1",
+    "mysql": "^2.18.1"
+  },
   "devDependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "multiparty": "^4.2.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

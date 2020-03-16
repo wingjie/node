@@ -1,6 +1,10 @@
 // let http = require('http')
 const express = require('express')
 const app = express()
+// const multiparty = require("multiparty")
+
+const multipart = require('connect-multiparty');
+const multipartMiddleware = multipart();
 // const fs = require('fs')
 // const path = require('path')
 // const url = require('url')
@@ -31,19 +35,15 @@ app.all('*', function(req, res, next) {
 //   }
 //     )
 
-  app.post("/requset",function (req,res) {
-    // console.log(req)
-    // var callback = req.body;
-    // res.send(callback + "({ name: '5'})")
-    req.on('data',function(data){
-      console.log(data, 'data');
-      obj=JSON.parse(data.toString('utf8'));
-      
-      // console.log(obj);
-      res.send(data)
-    })
+  app.post("/requset",multipartMiddleware, function (req,res) {
+    // console.log(req.body,req.files,req.files.file.path)
+    let file = JSON.stringify(req.files)
+    // let file = String.toString(req.files) 
+    console.log(file, 232343)
+    res.send(file ,req.files.file.path)
   });
-
+  // app.use(multiparty({uploadDir:'/upload' }))
+  
 app.listen(8080, (req,res) =>{
   console.log('8080')
 })
