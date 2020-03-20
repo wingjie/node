@@ -6,38 +6,193 @@
   <title>Document</title>
 </head>
 <body>
-  <form action="http://localhost:8080/requset" method="POST" enctype="multipart/form-data">
-    
+  <h3>form</h3>
+  <h4>application/x-www-form-urlencoded</h4>
+  <form action="http://localhost:8080/requset" method="POST" enctype="application/x-www-form-urlencoded">
     姓名：<input type="text" name="user"><br>
     年龄：<input type="number" name="age"><br>
     文件：<input type="file" name="file"><br>
     <input type="submit" value="提交">
   </form>
-
-  <div class="form">
+  <h4>text/plain</h4>
+  <form action="http://localhost:8080/requset" method="POST" enctype="text/plain">
     姓名：<input type="text" name="user"><br>
     年龄：<input type="number" name="age"><br>
     文件：<input type="file" name="file"><br>
+    <input type="submit" value="提交">
+  </form>
+  <h4>multipart/form-data</h4>
+  <form action="http://localhost:8080/requset" method="POST" enctype="multipart/form-data">
+    姓名：<input type="text" name="user"><br>
+    年龄：<input type="number" name="age"><br>
+    文件：<input type="file" name="file"  multiple><br>
+    <input type="submit" value="提交">
+  </form>
+  <h3>非form,form形式</h3>
+  <div class="form">
+    姓名：<input type="text" name="user"><br>
+    年龄：<input type="number" name="age"><br>
+    文件：<input type="file" id="fileA" name="file" multiple><br>
     <button onclick="subfn()">提交</button>
+  </div>
+  <h3>FileReader</h3>
+  <div class="FileReader">
+    姓名：<input type="text" name="user"><br>
+    年龄：<input type="number" name="age"><br>
+    base64 文件：<input type="file" id="fileB" name="file" multiple><br>
+    <div class="img"></div><br>
+
+    二进制 文件：<input type="file" id="fileC" name="file" multiple><br>
+    <div class="img"></div><br>
+    文本 文件：<input type="file" id="fileD" name="file" multiple><br>
+    <div class="img"></div><br>
+    <button onclick="FileReaderfn()">提交</button>
   </div>
 </body>
 <!-- application/x-www-form-urlencoded -->
 <script>
   let form = document.querySelectorAll('.form input')
+  let FileReaders = document.querySelectorAll('.FileReader input')
+  let fileA = document.querySelector('#fileA')
+  let fileB = document.querySelector('#fileB')
+  let fileC = document.querySelector('#fileC')
+  let fileD = document.querySelector('#fileD')
+  let img = document.querySelectorAll('.img')
+  
+  
+  var fileList, base
+  fileA.addEventListener('change', changfn, true)
+  fileB.addEventListener('change', changfnb, true)
+  fileC.addEventListener('change', changfnc, true)
+  fileD.addEventListener('change', changfnd, true)
   function subfn() {
+    let fd = new FormData()
+    let arr = fd.keys()
     let xhr = new XMLHttpRequest();
     xhr.open('post', 'http://localhost:8080/requset', true);
     xhr.setRequestHeader('content-type', "multipart/form-data");
-    let date = {user: form[0].value, age: form[1].value}
-    date = JSON.stringify(date)
-    console.log(date)
+    // let date = {user: form[0].value, age: form[1].value}
+    // date = JSON.stringify(date)
+    fd.append("user", form[0].value)
+    fd.append("age", form[1].value)
+    console.log(fileList, 'fileList')
+    fd.append("fileddddd", fileList)
+    console.log([...fd], 'fd')
+    // let arrs = []
+
+    // for(var props of arr){
+    //   // fd.getAll(props)
+    //   arrs.push(fd.getAll(props))
+    // }
+    // console.log(arr, arrs, 9999)
+    // console.log(date, fd)
     // xhr.send('user=' + form[0].value + '&age=' + form[1].value)
-    xhr.send(date)
+    xhr.send(fd)
     xhr.onreadystatechange = function (){
       if(this.readyState === 4 && this.status === 200) {
         console.log(this.responseText)
       }
     }
   }
+  function changfn(e) {
+    let ev = e || window.event
+    let {files} = e.target
+    fileList = files[0]
+  }
+  // base64
+  function changfnb(e) {
+    let ev = e || window.event
+    let {files} = e.target
+    console.log(files) 
+    // for(var file of files) {
+    //   var fileRea der   = new FileReader()
+    //   fileReader.readAsDataURL(files[0])
+    //   fileReader.onprogress = function(e) {
+    //     console.log(e)
+    //     if(!e.lengthComputable) return
+    //         // 四舍五入计算百分比
+    //     let percent = Math.round((e.loaded / e.total) * 100)
+    //     console.log(`${file.name},progress is ${percent}%`)
+    //     img[0].innerHTML = `${file.name},progress is ${percent}%`
+    //   }
+
+    // }
+    var reader = new FileReader()
+    //将文件以Data URL形式读入页面 
+    reader.readAsDataURL(files[0])
+    reader.onload = function(e) {
+      console.log(this.result)
+      base = this.result
+      img[0].innerHTML= '<img src="' + this.result +'" alt="" />'
+    }
+    
+  }
+  // 二进制
+  function changfnc(e) {
+    let ev = e || window.event
+    let {files} = e.target
+    let fileReader = new FileReader()
+    fileReader.readAsBinaryString(files[0])
+    fileReader.onload = function(e) {
+      console.log(fileReader.result)
+      img[1].innerHTML = this.result
+    }
+  }
+  // 文本
+  function changfnd(e) {
+    let ev = e || window.event
+    let {files} = e.target
+    base = files[0]
+    // console.log(e.target)
+    // let fileReader = new FileReader()
+    // fileReader.readAsText(files[0])
+    // fileReader.onload = function(e) {
+    //   console.log(fileReader.result)
+    //   img[2].innerHTML = this.result
+    // }
+  }
+  // buffer
+  // function changfnd(e) {
+  //   let ev = e || window.event
+  //   let {files} = e.target
+  //   console.log(e.target)
+  //   let fileReader = new FileReader()
+  //   fileReader.readAsArrayBuffer(files[0])
+  //   fileReader.onload = function(e) {
+  //     console.log(fileReader.result)
+  //     img[2].innerHTML = this.result
+  //   }
+  // }
+  function FileReaderfn() {
+    let fd = new FormData()
+    let arr = fd.keys()
+    let xhr = new XMLHttpRequest();
+    xhr.open('post', 'http://localhost:8080/requset', true);
+    xhr.setRequestHeader('content-type', "multipart/form-data");
+    let date = {user: FileReaders[0].value, age: FileReaders[1].value}
+    date = JSON.stringify(date)
+    fd.append("user", FileReaders[0].value)
+    fd.append("age", FileReaders[1].value)
+    fd.append("fileddddd", base)
+    let arrs = []
+
+    for(var props of arr){
+      // fd.getAll(props)
+      arrs.push(fd.getAll(props))
+    }
+    console.log(arr, arrs, 9999)
+    console.log(date, fd)
+    // xhr.send('user=' + form[0].value + '&age=' + form[1].value)
+    xhr.send(fd)
+    xhr.onreadystatechange = function (){
+      if(this.readyState === 4 && this.status === 200) {
+        console.log(this.responseText)
+      }
+    }
+  }
+
+
+  
+  
 </script>
 </html>
